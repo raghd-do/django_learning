@@ -5,4 +5,6 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('redirect/', views.redirect_view, name='redirect_view'),
     path("users/", views.user_profile, name="user_profile"),
+    path("add_task/<int:x>/<int:y>/", views.add_task, name="add_task"),
+    path("multiply_task/<int:x>/<int:y>/", views.multiply_task, name="multiply_task"),
 ]

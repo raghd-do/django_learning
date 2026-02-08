@@ -1,6 +1,7 @@
 from django.shortcuts import redirect
 from django.http import JsonResponse
 from .models import userProfile
+from .tasks import add, multiply
 
 
 # Create your views here.
@@ -18,3 +19,11 @@ def redirect_view(request):
 
 def user_profile(request):
      return JsonResponse({"profiles": list(userProfile.objects.all().values())})
+
+def add_task(request, x, y):
+     add_result = add(x, y)
+     return JsonResponse({"result": add_result})
+
+def multiply_task(request, x, y):
+     multiply_result = multiply(x, y)
+     return JsonResponse({"result": multiply_result})
