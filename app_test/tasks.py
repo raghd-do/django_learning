@@ -1,6 +1,5 @@
-from app_test.models import userProfile
 from celery import shared_task
-
+from .models import userProfile
 
 @shared_task
 def add(x, y):
@@ -13,6 +12,14 @@ def multiply(x, y):
 @shared_task
 def create_user_profile(first_name, last_name, email):
     userProfile.objects.create(first_name=first_name, last_name=last_name, email=email)
+
+@shared_task
+def send_email(user_pk, subject, message):
+    try:
+        user = userProfile.objects.get(pk=user_pk)
+        return {"email": user.email, "subject": subject, "message": message}
+    except userProfile.DoesNotExist:
+        raise ValueError(f"User profile with id {user_pk} does not exist")
 
 @shared_task
 def count_user_profiles():

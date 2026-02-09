@@ -1,7 +1,7 @@
 from django.shortcuts import redirect
 from django.http import JsonResponse
 from .models import userProfile
-from .tasks import add, multiply
+from .tasks import add, multiply, create_user_profile, send_email, count_user_profiles, rename_user_profile
 
 
 # Create your views here.
@@ -19,6 +19,11 @@ def redirect_view(request):
 
 def user_profile(request):
      return JsonResponse({"profiles": list(userProfile.objects.all().values())})
+
+def add_user(request, first_name, last_name, email):
+     user = userProfile.objects.create(first_name=first_name, last_name=last_name, email=email)
+     sent_email = send_email.delay_on_commit(user_pk=user.id, subject="Welcome!", message=f"Hello {first_name}, your profile has been created.")
+     return JsonResponse({"message": "User profile created", "sent_email": sent_email})
 
 def add_task(request, x, y):
      add_result = add(x, y)
