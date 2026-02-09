@@ -7,10 +7,45 @@ services:
   #     POSTGRES_DB: mydb
   #     POSTGRES_USER: user
   #     POSTGRES_PASSWORD: password
-  web:
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  django:
     build: .
+    container_name: django
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app
     ports:
       - "8000:8000"
+    depends_on:
+      - redis
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+  
+  celery_worker:
+    build: .
+    container_name: celery_worker
+    command: celery -A django_learning worker -l info
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+      - django
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+  
+  celery_beat:
+    build: .
+    container_name: celery_beat
+    command: celery -A django_learning beat -l info
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+      - django
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
