@@ -17,7 +17,8 @@ def create_user_profile(first_name, last_name, email):
 def send_email(user_pk, subject, message):
     try:
         user = userProfile.objects.get(pk=user_pk)
-        return {"email": user.email, "subject": subject, "message": message}
+        print(f"Sending email to {user.email} with subject '{subject}' and message '{message}'")
+        return None
     except userProfile.DoesNotExist:
         raise ValueError(f"User profile with id {user_pk} does not exist")
 
