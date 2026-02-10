@@ -1,4 +1,6 @@
 from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 from django.http import JsonResponse
 from .models import userProfile
 # from .tasks import add, multiply, create_user_profile, send_email, count_user_profiles, rename_user_profile
@@ -12,17 +14,17 @@ class create_user(APIView):
         last_name = request.data.get('last_name')
         email = request.data.get('email')
         if not all([first_name, last_name, email]):
-            return JsonResponse({"error": "Missing required fields"}, status=400)
+            return Response({"error": "Missing required fields"}, status=status.HTTP_400_BAD_REQUEST)
         user = userProfile.objects.create(first_name=first_name, last_name=last_name, email=email)
-        return JsonResponse({"message": "User created", "user_id": user.id}, status=201)
+        return Response({"message": "User created", "user_id": user.id}, status=status.HTTP_201_CREATED)
     
 class read_user(APIView):
     def get(self, request, user_id):
         try:
             user = userProfile.objects.get(id=user_id)
-            return JsonResponse({"id": user.id, "first_name": user.first_name, "last_name": user.last_name, "email": user.email})
+            return Response({"id": user.id, "first_name": user.first_name, "last_name": user.last_name, "email": user.email})
         except userProfile.DoesNotExist:
-            return JsonResponse({"error": "User not found"}, status=404)
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
 class update_user(APIView):
     def put(self, request, user_id):
@@ -32,18 +34,18 @@ class update_user(APIView):
             user.last_name = request.data.get('last_name', user.last_name)
             user.email = request.data.get('email', user.email)
             user.save()
-            return JsonResponse({"message": "User updated"})
+            return Response({"message": "User updated"}, status=status.HTTP_200_OK)
         except userProfile.DoesNotExist:
-            return JsonResponse({"error": "User not found"}, status=404)
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
 class delete_user(APIView):
     def delete(self, request, user_id):
         try:
             user = userProfile.objects.get(id=user_id)
             user.delete()
-            return JsonResponse({"message": "User deleted"})
+            return Response({"message": "User deleted"}, status=status.HTTP_200_OK)
         except userProfile.DoesNotExist:
-            return JsonResponse({"error": "User not found"}, status=404)
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
 class all_users(APIView):
     def get(self, request):
@@ -57,7 +59,7 @@ class all_users(APIView):
             }
             for user in users
         ]
-        return JsonResponse(users_data, safe=False)
+        return Response(users_data, status=status.HTTP_200_OK)
 
 # APIView celery example
 # class AddTask(APIView):
