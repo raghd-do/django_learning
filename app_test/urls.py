@@ -10,5 +10,5 @@ urlpatterns = [
     path('api/all_users', views.all_users, name='all_users'),
 
     # APIView example
-    path("api/add_task/<int:x>/<int:y>/", views.AddTask.as_view(), name="api_add_task"),
+    # path("api/add_task/<int:x>/<int:y>/", views.AddTask.as_view(), name="api_add_task"),
 ]
