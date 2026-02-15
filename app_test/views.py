@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import userProfile
-from .tasks import  send_email
+from .tasks import  send_email, daily_database_task
 import logging
 logger = logging.getLogger(__name__)
 
@@ -69,4 +69,5 @@ class all_users(APIView):
             }
             for user in users
         ]
+        daily_database_task.delay()
         return Response(users_data, status=status.HTTP_200_OK)

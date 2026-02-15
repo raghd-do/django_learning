@@ -8,7 +8,4 @@ urlpatterns = [
     path('api/update_user/<int:user_id>/', views.update_user.as_view(), name='update_user'),
     path('api/delete_user/<int:user_id>/', views.delete_user.as_view(), name='delete_user'),
     path('api/all_users', views.all_users.as_view(), name='all_users'),
-
-    # APIView examples for Celery tasks
-    # path("api/add_task/<int:x>/<int:y>/", views.AddTask.as_view(), name="api_add_task"),
 ]
