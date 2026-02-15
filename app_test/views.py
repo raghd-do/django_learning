@@ -1,11 +1,10 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from django.http import JsonResponse
 from .models import userProfile
-# from .tasks import add, multiply, create_user_profile, send_email, count_user_profiles, rename_user_profile
-# import logging
-# logger = logging.getLogger(__name__)
+from .tasks import  send_email
+import logging
+logger = logging.getLogger(__name__)
 
 # APIView CRUD example
 class create_user(APIView):
@@ -16,7 +15,18 @@ class create_user(APIView):
         if not all([first_name, last_name, email]):
             return Response({"error": "Missing required fields"}, status=status.HTTP_400_BAD_REQUEST)
         user = userProfile.objects.create(first_name=first_name, last_name=last_name, email=email)
+        self.send_welcome_email(user.id)
         return Response({"message": "User created", "user_id": user.id}, status=status.HTTP_201_CREATED)
+    
+    def send_welcome_email(self, user_id):
+        try:
+            user = userProfile.objects.get(id=user_id)
+            subject = "Welcome to our platform!"
+            message = f"Hi {user.first_name}, welcome to our platform. We're glad to have you here!"
+            print(f"Scheduling welcome email for user_id {user.id}")
+            send_email.delay(user.id, subject, message)
+        except userProfile.DoesNotExist:
+            logger.error(f"User with id {user_id} does not exist. Cannot send welcome email.")
     
 class read_user(APIView):
     def get(self, request, user_id):
@@ -60,18 +70,3 @@ class all_users(APIView):
             for user in users
         ]
         return Response(users_data, status=status.HTTP_200_OK)
-
-# APIView celery example
-# class AddTask(APIView):
-#     def get(self, request, x, y):
-#           add_result = int(request.GET.get("x", 0)) + int(request.GET.get("y", 0))
-#           # age = self.calAge(1990)
-#           return JsonResponse({"result": add_result})
-#     def calAge(self, birth_year):
-#         from datetime import datetime
-#         current_year = datetime.now().year
-#         return current_year - birth_year
-
-# def multiply_task(request, x, y):
-#      multiply_result = multiply.delay(x, y)
-#      return JsonResponse({"result": multiply_result})
