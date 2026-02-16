@@ -13,6 +13,7 @@ def send_email(user_id, subject, message):
     
 @shared_task
 def daily_database_task():
+    print("Running daily database task...")
     today = timezone.now().date()
     today_useers_count = userProfile.objects.filter(created_at__date=today).count()
     print(f"Number of user profiles created today: {today_useers_count}")

@@ -41,7 +41,7 @@ services:
   celery_beat:
     build: .
     container_name: celery_beat
-    command: celery -A django_learning beat -l info
+    command: celery -A django_learning beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
     volumes:
       - .:/app
     depends_on:
